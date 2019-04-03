@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/cjmay/miniconda3/bin/python"
+    "python.pythonPath": "/Users/cjmay/.pyenv/versions/3.6.8/bin/python",
+    "python.linting.enabled": true
 }
