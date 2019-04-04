@@ -1,66 +1,64 @@
-const int clkPin= 2; //the clk attach to pin 2
-const int dtPin= 3; //the dt pin attach to pin 3
-const int swPin= 4 ;//the sw pin attach to pin 4
+#include <TM1637Display.h>
+#include <Encoder.h>
 
+
+volatile boolean TurnDetected;
+volatile boolean up;
+
+const int rCLK=2;                   // Used for generating interrupts using CLK signal
+const int rDT=3;                    // Used for reading DT signal
+const int dCLK=4; //display pin 
+const int dDIO=5; //display pin
+const int MIN_WIND=0;
+const int MAX_WIND=200;
+const int WIND_THRESHOLD = 55;
+TM1637Display display(dCLK, dDIO);
+
+void isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
+ if (digitalRead(rCLK))
+   up = digitalRead(rDT);
+ else
+   up = !digitalRead(rDT);
+ TurnDetected = true;
+}
+
+
+void setup ()  {
+ pinMode(rCLK,INPUT);
+ pinMode(rDT,INPUT);  
+ attachInterrupt (0,isr,FALLING);   // interrupt 0 is always connected to pin 2 on Arduino UNO
+ Serial.begin (9600);
+ display.setBrightness(0x0a);
+}
+
+void loop ()  {
+ static long virtualPosition=0;    // without STATIC it does not count correctly!!!
+ 
+ if (TurnDetected)  {        // do this only if rotation was detected
+   if (up)
+     virtualPosition = virtualPosition + 2;
+   else
+     virtualPosition = virtualPosition - 2;
+   TurnDetected = false;          // do NOT repeat IF loop until new rotation detected
+ }
+
+ if (virtualPosition >= MAX_WIND) {
+  virtualPosition = 200;
+ }
+ else if (virtualPosition <= MIN_WIND) {
+  virtualPosition = 0;
+ }
+
+ String wind_level;
+ if (virtualPosition >= WIND_THRESHOLD) {
+   wind_level = "high_wind";
+ }
+ else {
+  wind_level = "low_wind";
+ }
+
+display.showNumberDec(virtualPosition);
  
 
-int encoderVal = 0;
-
  
-
-void setup()
-{ 
-//set clkPin,dePin,swPin as INPUT
-pinMode(clkPin, INPUT);
-pinMode(dtPin, INPUT);
-pinMode(swPin, INPUT);
-digitalWrite(swPin, HIGH);
-Serial.begin(9600); // initialize serial communications at 9600 bps
-
- 
-
-}
-
- 
-
-void loop()
-{
-int change = getEncoderTurn();//
-encoderVal = encoderVal + change;
-encoderVal = encoderVal*(-1);
-//Serial.println(encoderVal);
-/*if(encoderVal > 200) { 
-  encoderVal = 200;
-}
-if (encoderVal < 0) {
-  encoderVal = 0;
-}
-if(digitalRead(swPin) == LOW)//if button pull down
-{
-encoderVal = 0;
-} */
-/*Serial.println(encoderVal); */
-}
-
- 
-
-int getEncoderTurn(void)
-{
-static int oldA = HIGH; //set the oldA as HIGH
-static int oldB = HIGH; //set the oldB as HIGH
-int result = 0;
-int newA = digitalRead(clkPin);//read the value of clkPin to newA
-int newB = digitalRead(dtPin);//read the value of dtPin to newB
-Serial.println(digitalRead(swPin));
-if (newA != oldA || newB != oldB) //if the value of clkPin or the dtPin has changed
-{
-// something has changed
-if (oldA == HIGH && newA == LOW)
-{
-result = (oldB * 2 - 1);
-}
-}
-oldA = newA;
-oldB = newB;
-return result;
 }
