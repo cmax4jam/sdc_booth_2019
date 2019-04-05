@@ -31,7 +31,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  rain();
+  rainbow();
 }
 
 void allOff(){
@@ -124,6 +124,36 @@ void rain(){
   DmxSimple.write(1,255);
 }
 
+void setColourRgb(unsigned int red, unsigned int green, unsigned int blue) {
+  DmxSimple.write(2, red);
+  DmxSimple.write(3, green);
+  DmxSimple.write(4, blue);
+ }
+
+void rainbow(){
+   unsigned int rgbColour[3];
+
+  // Start off with red.
+  rgbColour[0] = 255;
+  rgbColour[1] = 0;
+  rgbColour[2] = 0;  
+
+  DmxSimple.write(1,255);
+
+  // Choose the colours to increment and decrement.
+  for (int decColour = 0; decColour < 3; decColour += 1) {
+    int incColour = decColour == 2 ? 0 : decColour + 1;
+
+    // cross-fade the two colours.
+    for(int i = 0; i < 255; i += 1) {
+      rgbColour[decColour] -= 1;
+      rgbColour[incColour] += 1;
+      
+      setColourRgb(rgbColour[0], rgbColour[1], rgbColour[2]);
+      delay(13);
+    }
+  }
+}
 
 void loop() {
   
