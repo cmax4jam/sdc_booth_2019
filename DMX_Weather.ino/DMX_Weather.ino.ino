@@ -13,8 +13,6 @@
 
 unsigned long storm_start;
 
-unsigned long lightning_duration = 100;
-
 // How long each weather effect lasts
 // 10 seconds
 unsigned long weather_duration = 10000;
@@ -32,8 +30,6 @@ void setup() {
   ** do this, DmxSimple will set the maximum channel number to the
   ** highest channel you both_write() to. */
   DmxSimple.maxChannel(256);
-
-  hurricane();
 }
 
 void allOff(){
@@ -54,6 +50,8 @@ void both_write(int chan, int val){
 
 void lightning(){
 
+  unsigned long lightning_duration = 100;
+
   both_write(1,0);
   
   both_write(2, 255); //R
@@ -63,17 +61,25 @@ void lightning(){
   delay(100);
 
   // If it is time to start the lightning strike
-  both_write(1,128);
+  DmxSimple.write(1,128);
+  delay(33);
+  DmxSimple.write(5,128);
 
-  delay(lightning_duration/3);
-  both_write(1,0);
+  delay(lightning_duration/3 - 33);
+  DmxSimple.write(1,0);
+
+  delay(33);
+  DmxSimple.write(5,0);
+
+  delay(lightning_duration/3 - 33);
   
+  DmxSimple.write(1,128);
 
-  delay(lightning_duration/3);
-  
-  both_write(1,128);
+  delay(33);
 
-  delay(lightning_duration/3 + 50);
+  DmxSimple.write(5,128);
+
+  delay(lightning_duration/3 + 50 - 33);
 
   return;
 }
@@ -93,20 +99,20 @@ void rain(){
   // Whether it should be getting brighter or darker
   int sign = 1;
 
-  int green = 50;
+  int red = 50;
 
   both_write(1, 100);
-  both_write(2, 0);
-  both_write(3, green);
+  both_write(2, red);
+  both_write(3, 0);
   both_write(4,200);
 
   while(millis() < rain_start + weather_duration){
-    both_write(3,green);
-    green = green + sign;
+    both_write(3,red);
+    red = red + sign;
 
-    if(green > 100){
+    if(red > 60){
       sign = -1;
-    } else if (green < 10){
+    } else if (red < 10){
       sign = 1;
     }
 
@@ -117,15 +123,15 @@ void rain(){
 
       // Continue the cycle
       both_write(1, 100);
-      both_write(2, 0);
-      both_write(3, green);
+      both_write(2, red);
+      both_write(3, 0);
       both_write(4,200);
 
       // Find the next lightning bolt
       lightning_start = millis() + lightning_time();
     }
 
-    delay(30);
+    delay(20);
   }
 
   both_write(1,255);
@@ -176,7 +182,7 @@ void snow(){
 
   while(millis() < snow_start + 10000){
     
-    if (scale < 60){
+    if (scale < 40){
       sign = 1;
     } else if (scale > 90){
       sign = -1;
@@ -293,6 +299,36 @@ void hurricane(){
 
 
 void loop() {
-  
+  if(Serial.available()){         //From RPi to Arduino
+    int r = 1;
+    r = r * (Serial.read() - '0');  //conveting the value of chars to integer
+    switch(r){
+      case 1:
+        sunny();
+        break;
+      case 2:
+        rainbow();
+        break;
+      case 3:
+        rain();
+        break;
+      case 4:
+        snow();
+        break;
+      case 5:
+        hurricane();
+        break;
+      case 6:
+        tornado();
+        break;
+    }
+  }
+  else{
+    //Night
+    both_write(1,255);
+    both_write(2,5);
+    both_write(3,2);
+    both_write(4,0);
+  }
 }
 
