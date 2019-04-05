@@ -33,7 +33,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  tornado();
+  hurricane();
 }
 
 void allOff(){
@@ -230,6 +230,61 @@ void tornado(){
       flicker_end = flicker_start + random(50,800);
     }
   }
+}
+
+void flicker(){
+  DmxSimple.write(1,0);
+  delay(random(50,800));
+  DmxSimple.write(1,100);
+  return;
+}
+
+void hurricane(){
+  
+  unsigned long rain_start = millis();
+
+  unsigned long flicker_start= rain_start + flicker_time();
+
+  // Whether it should be getting brighter or darker
+  int sign = 1;
+
+  int green = 50;
+
+  DmxSimple.write(1, 100);
+  DmxSimple.write(2, 0);
+  DmxSimple.write(3, green);
+  DmxSimple.write(4,200);
+
+  while(millis() < rain_start + weather_duration){
+    DmxSimple.write(3,green);
+    green = green + sign;
+
+    if(green > 150){
+      sign = -1;
+    } else if (green < 10){
+      sign = 1;
+    }
+
+    // If it is time for lightning
+    if(millis() >= flicker_start){
+      // Trigger the lightning flash
+      flicker();
+
+      // Continue the cycle
+      DmxSimple.write(1, 100);
+      DmxSimple.write(2, 0);
+      DmxSimple.write(3, green);
+      DmxSimple.write(4,200);
+
+      // Find the next lightning bolt
+      flicker_start = millis() + flicker_time();
+    }
+
+    delay(15);
+  }
+
+  DmxSimple.write(1,255);
+  hurricane();
 }
 
 
