@@ -33,7 +33,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  sunny();
+  tornado();
 }
 
 void allOff(){
@@ -194,6 +194,42 @@ void sunny(){
   DmxSimple.write(3,124);
   DmxSimple.write(4,24);
   delay(10000);
+}
+
+long flicker_time(){
+  return random(100, 1500);
+}
+
+void tornado(){
+  unsigned long tornado_start = millis();
+
+  DmxSimple.write(1,255);
+  DmxSimple.write(2,160);
+  DmxSimple.write(3,160);
+  DmxSimple.write(4,160);
+
+  boolean on = true;
+
+  unsigned long flicker_start = tornado_start + flicker_time();
+  unsigned long flicker_end = flicker_start + random(50,800);
+
+  unsigned long cur_time = millis();
+ 
+  while(cur_time < tornado_start + 10000){
+    cur_time = millis();
+    
+    if(cur_time >= flicker_start and on == true){
+      DmxSimple.write(1,0);
+      on = false;
+    }
+    if(cur_time >= flicker_end and on == false){
+      DmxSimple.write(1,255);
+      on = true;
+
+      flicker_start = flicker_end + flicker_time();
+      flicker_end = flicker_start + random(50,800);
+    }
+  }
 }
 
 
