@@ -13,13 +13,16 @@
 
 unsigned long storm_start;
 
-unsigned long lightning_duration = 50;
+unsigned long lightning_duration = 100;
+
+// How long each weather effect lasts
+// 10 seconds
+unsigned long weather_duration = 10000;
 
 void setup() {
   /* The most common pin for DMX output is pin 3, which DmxSimple
   ** uses by default. If you need to change that, do it here. */
   DmxSimple.usePin(2);
-  Serial.begin(9600);
 
   /* DMX devices typically need to receive a complete set of channels
   ** even if you only need to adjust the first channel. You can
@@ -28,7 +31,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  storm();
+  rain();
 }
 
 void allOff(){
@@ -42,69 +45,83 @@ long lightning_time(){
   return random(450,3000);
 }
 
-void storm(){
-  storm_start = millis();
 
-  // The storms last 10 seconds
-  unsigned long storm_end = storm_start + 10000;
-
-  // The time in milliseconds to start the flash
-  // Not the duration but the actual time
-  unsigned long lightning_start;
-
-  // The time in milliseconds to stop the flash
-  unsigned long lightning_stop;
-
-  // If there is currently a flash going on
-  boolean lightning_on = false;
+void lightning(){
 
   DmxSimple.write(1,0);
   DmxSimple.write(2, 255); //R
   DmxSimple.write(3, 255); //G
   DmxSimple.write(4, 155); //B
 
-  lightning_start = storm_start + lightning_time();
-  lightning_stop = lightning_start + lightning_duration;
+  delay(100);
 
-  while(true){
-    unsigned long cur_time = millis();
+  // If it is time to start the lightning strike
+  DmxSimple.write(1,128);
 
-    /*
-     * If we've passed the end of the storm stop triggering
-     * lightning
-     */
-    if(cur_time >= storm_end){
-      return;
+  delay(lightning_duration/3);
+  DmxSimple.write(1,0);
+  
+
+  delay(lightning_duration/3);
+  
+  DmxSimple.write(1,128);
+
+  delay(lightning_duration/3 + 50);
+
+  return;
+}
+
+void rain(){
+
+  // The time in milliseconds to stop the flash
+  unsigned long lightning_stop;
+
+  // If there is currently a flash going on
+  boolean lightning_on = false;
+  
+  unsigned long rain_start = millis();
+
+  unsigned long lightning_start = rain_start + lightning_time();
+
+  // Whether it should be getting brighter or darker
+  int sign = 1;
+
+  int green = 50;
+
+  DmxSimple.write(1, 100);
+  DmxSimple.write(2, 0);
+  DmxSimple.write(3, green);
+  DmxSimple.write(4,200);
+
+  while(millis() < rain_start + weather_duration){
+    DmxSimple.write(3,green);
+    green = green + sign;
+
+    if(green > 100){
+      sign = -1;
+    } else if (green < 10){
+      sign = 1;
     }
 
-    // If it is time to start the lightning strike
-    if(cur_time >= lightning_start and  !lightning_on){
-      DmxSimple.write(1,255);
-      lightning_on = true;
+    // If it is time for lightning
+    if(millis() >= lightning_start){
+      // Trigger the lightning flash
+      lightning();
+
+      // Continue the cycle
+      DmxSimple.write(1, 100);
+      DmxSimple.write(2, 0);
+      DmxSimple.write(3, green);
+      DmxSimple.write(4,200);
+
+      // Find the next lightning bolt
+      lightning_start = millis() + lightning_time();
     }
 
-
-    // Flicker off after 3 milliseconds
-    if(cur_time - lightning_start >= 16 & cur_time - lightning_start < 32){
-      DmxSimple.write(1,0);
-    }
-
-    if(cur_time - lightning_start >= 32 & cur_time - lightning_start < 50){
-      DmxSimple.write(1,255);
-    }
-
-    // If it is time to turn off the lightning strike
-    if(cur_time >= lightning_stop and lightning_on){
-      DmxSimple.write(1,0);
-      lightning_on = false;
-
-      // Find the time of the next lightning bolt
-      lightning_start = lightning_start + lightning_time();
-      lightning_stop = lightning_start + lightning_duration;
-    }
+    delay(30);
   }
 
-  storm();
+  DmxSimple.write(1,255);
 }
 
 
