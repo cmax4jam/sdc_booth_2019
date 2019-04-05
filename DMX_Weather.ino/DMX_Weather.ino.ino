@@ -30,14 +30,14 @@ void setup() {
   ** even if you only need to adjust the first channel. You can
   ** easily change the number of channels sent here. If you don't
   ** do this, DmxSimple will set the maximum channel number to the
-  ** highest channel you DmxSimple.write() to. */
+  ** highest channel you both_write() to. */
   DmxSimple.maxChannel(256);
 
   hurricane();
 }
 
 void allOff(){
-  DmxSimple.write(1,0);
+  both_write(1,0);
 }
 
 /*
@@ -47,26 +47,31 @@ long lightning_time(){
   return random(450,3000);
 }
 
+void both_write(int chan, int val){
+  DmxSimple.write(chan, val);
+  DmxSimple.write(chan + 4, val);
+}
 
 void lightning(){
 
-  DmxSimple.write(1,0);
-  DmxSimple.write(2, 255); //R
-  DmxSimple.write(3, 255); //G
-  DmxSimple.write(4, 155); //B
+  both_write(1,0);
+  
+  both_write(2, 255); //R
+  both_write(3, 255); //G
+  both_write(4, 155); //B
 
   delay(100);
 
   // If it is time to start the lightning strike
-  DmxSimple.write(1,128);
+  both_write(1,128);
 
   delay(lightning_duration/3);
-  DmxSimple.write(1,0);
+  both_write(1,0);
   
 
   delay(lightning_duration/3);
   
-  DmxSimple.write(1,128);
+  both_write(1,128);
 
   delay(lightning_duration/3 + 50);
 
@@ -90,13 +95,13 @@ void rain(){
 
   int green = 50;
 
-  DmxSimple.write(1, 100);
-  DmxSimple.write(2, 0);
-  DmxSimple.write(3, green);
-  DmxSimple.write(4,200);
+  both_write(1, 100);
+  both_write(2, 0);
+  both_write(3, green);
+  both_write(4,200);
 
   while(millis() < rain_start + weather_duration){
-    DmxSimple.write(3,green);
+    both_write(3,green);
     green = green + sign;
 
     if(green > 100){
@@ -111,10 +116,10 @@ void rain(){
       lightning();
 
       // Continue the cycle
-      DmxSimple.write(1, 100);
-      DmxSimple.write(2, 0);
-      DmxSimple.write(3, green);
-      DmxSimple.write(4,200);
+      both_write(1, 100);
+      both_write(2, 0);
+      both_write(3, green);
+      both_write(4,200);
 
       // Find the next lightning bolt
       lightning_start = millis() + lightning_time();
@@ -123,13 +128,13 @@ void rain(){
     delay(30);
   }
 
-  DmxSimple.write(1,255);
+  both_write(1,255);
 }
 
 void setColourRgb(unsigned int red, unsigned int green, unsigned int blue) {
-  DmxSimple.write(2, red);
-  DmxSimple.write(3, green);
-  DmxSimple.write(4, blue);
+  both_write(2, red);
+  both_write(3, green);
+  both_write(4, blue);
  }
 
 void rainbow(){
@@ -140,7 +145,7 @@ void rainbow(){
   rgbColour[1] = 0;
   rgbColour[2] = 0;  
 
-  DmxSimple.write(1,255);
+  both_write(1,255);
 
   // Choose the colours to increment and decrement.
   for (int decColour = 0; decColour < 3; decColour += 1) {
@@ -159,10 +164,10 @@ void rainbow(){
 
 
 void snow(){
-  DmxSimple.write(1,255);
-  DmxSimple.write(2,55);
-  DmxSimple.write(3,55);
-  DmxSimple.write(4,75);
+  both_write(1,255);
+  both_write(2,55);
+  both_write(3,55);
+  both_write(4,75);
 
   unsigned long snow_start = millis();
 
@@ -179,20 +184,20 @@ void snow(){
 
     scale = scale + sign;
 
-    DmxSimple.write(1, 125);
-    DmxSimple.write(2, 55 * scale/100);
-    DmxSimple.write(3, 55 * scale/100);
-    DmxSimple.write(4, 75 * scale/100);
+    both_write(1, 125);
+    both_write(2, 55 * scale/100);
+    both_write(3, 55 * scale/100);
+    both_write(4, 75 * scale/100);
 
     delay(30);
   }
 }
 
 void sunny(){
-  DmxSimple.write(1,125);
-  DmxSimple.write(2,205);
-  DmxSimple.write(3,124);
-  DmxSimple.write(4,24);
+  both_write(1,125);
+  both_write(2,205);
+  both_write(3,124);
+  both_write(4,24);
   delay(10000);
 }
 
@@ -203,10 +208,10 @@ long flicker_time(){
 void tornado(){
   unsigned long tornado_start = millis();
 
-  DmxSimple.write(1,255);
-  DmxSimple.write(2,160);
-  DmxSimple.write(3,160);
-  DmxSimple.write(4,160);
+  both_write(1,255);
+  both_write(2,160);
+  both_write(3,160);
+  both_write(4,160);
 
   boolean on = true;
 
@@ -219,11 +224,11 @@ void tornado(){
     cur_time = millis();
     
     if(cur_time >= flicker_start and on == true){
-      DmxSimple.write(1,0);
+      both_write(1,0);
       on = false;
     }
     if(cur_time >= flicker_end and on == false){
-      DmxSimple.write(1,255);
+      both_write(1,255);
       on = true;
 
       flicker_start = flicker_end + flicker_time();
@@ -233,9 +238,9 @@ void tornado(){
 }
 
 void flicker(){
-  DmxSimple.write(1,0);
+  both_write(1,0);
   delay(random(50,800));
-  DmxSimple.write(1,100);
+  both_write(1,100);
   return;
 }
 
@@ -250,13 +255,13 @@ void hurricane(){
 
   int green = 50;
 
-  DmxSimple.write(1, 100);
-  DmxSimple.write(2, 0);
-  DmxSimple.write(3, green);
-  DmxSimple.write(4,200);
+  both_write(1, 100);
+  both_write(2, 0);
+  both_write(3, green);
+  both_write(4,200);
 
   while(millis() < rain_start + weather_duration){
-    DmxSimple.write(3,green);
+    both_write(3,green);
     green = green + sign;
 
     if(green > 150){
@@ -271,20 +276,19 @@ void hurricane(){
       flicker();
 
       // Continue the cycle
-      DmxSimple.write(1, 100);
-      DmxSimple.write(2, 0);
-      DmxSimple.write(3, green);
-      DmxSimple.write(4,200);
+      both_write(1, 100);
+      both_write(2, 0);
+      both_write(3, green);
+      both_write(4,200);
 
       // Find the next lightning bolt
       flicker_start = millis() + flicker_time();
     }
 
-    delay(15);
+    delay(10);
   }
 
-  DmxSimple.write(1,255);
-  hurricane();
+  both_write(1,255);
 }
 
 
