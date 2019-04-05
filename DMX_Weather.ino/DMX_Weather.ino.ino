@@ -24,6 +24,8 @@ void setup() {
   ** uses by default. If you need to change that, do it here. */
   DmxSimple.usePin(2);
 
+  Serial.begin(9600);
+
   /* DMX devices typically need to receive a complete set of channels
   ** even if you only need to adjust the first channel. You can
   ** easily change the number of channels sent here. If you don't
@@ -31,7 +33,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  rainbow();
+  snow();
 }
 
 void allOff(){
@@ -152,6 +154,37 @@ void rainbow(){
       setColourRgb(rgbColour[0], rgbColour[1], rgbColour[2]);
       delay(13);
     }
+  }
+}
+
+
+void snow(){
+  DmxSimple.write(1,255);
+  DmxSimple.write(2,55);
+  DmxSimple.write(3,55);
+  DmxSimple.write(4,75);
+
+  unsigned long snow_start = millis();
+
+  int scale = 100;
+  int sign = -1;
+
+  while(millis() < snow_start + 10000){
+    
+    if (scale < 60){
+      sign = 1;
+    } else if (scale > 90){
+      sign = -1;
+    }
+
+    scale = scale + sign;
+
+    DmxSimple.write(1, 125);
+    DmxSimple.write(2, 55 * scale/100);
+    DmxSimple.write(3, 55 * scale/100);
+    DmxSimple.write(4, 75 * scale/100);
+
+    delay(30);
   }
 }
 
