@@ -33,7 +33,7 @@ void setup() {
   ** highest channel you DmxSimple.write() to. */
   DmxSimple.maxChannel(256);
 
-  snow();
+  sunny();
 }
 
 void allOff(){
@@ -187,6 +187,15 @@ void snow(){
     delay(30);
   }
 }
+
+void sunny(){
+  DmxSimple.write(1,125);
+  DmxSimple.write(2,205);
+  DmxSimple.write(3,124);
+  DmxSimple.write(4,24);
+  delay(10000);
+}
+
 
 void loop() {
   
