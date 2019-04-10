@@ -21,36 +21,36 @@
 
 
 import subprocess, serial, time
-serArd1 = serial.Serial('/dev/ttyUSB0', 9600)
-serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
+ser = serial.Serial('/dev/ttyUSB0', 9600)
+#serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
     
 
 def main():
     #time.sleep(2)
-    subprocess.call(COMMAND_DICT["sun"], cwd='videos/')
+    subprocess.call(COMMAND_DICT["bottom-layer"], cwd='videos/')
 
-    COMMAND_DICT = {"sun":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'], 
-                     "rain":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
-                     "snow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
-                     "tornado":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
-                     "hurricane":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
-                     "rainbow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
-                     "bottom-layer"}
+    COMMAND_DICT = {"sun":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'], 
+                     "rain":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
+                     "snow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
+                     "tornado":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
+                     "hurricane":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
+                     "rainbow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
+                     "bottom-layer":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '1', '--loop','&']}
     while True:
-        if ser.in_waiting > 0 and BUTTON PRESSED:
-            
+        if ser.in_waiting > 0 and BUTTON PRESSED:    ###FIX THIS
+            line = ser.readline()
             #Arduinos constantly send data, captured all at once with big "submit" button from raspi
-            if SUN CONDITIONS:
+            if line == "Sun":
                 subprocess.call(COMMAND_DICT["sun"], cwd='videos/')
-            elif RAIN CONDITIONS:
+            elif line == "Rain":
                 subprocess.call(COMMAND_DICT["rain"], cwd='videos/')
-            elif HURRICANE CONDITIONS:
+            elif line == "Hurricane":
                 subprocess.call(COMMAND_DICT["hurricane"], cwd='videos/')
-            elif TORNADO CONDITIONS:
+            elif line == "Tornado":
                 subprocess.call(COMMAND_DICT["tornado"], cwd='videos/')
-            elif SNOW CONDITIONS:
+            elif line == "Snow":
                 subprocess.call(COMMAND_DICT["snow"], cwd='videos/')
-            elif RAINBOW CONDITIONS:
+            elif line == "Rainbow":
                 subprocess.call(COMMAND_DICT["rainbow"], cwd='videos/')
 
 
