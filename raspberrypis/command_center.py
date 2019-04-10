@@ -23,12 +23,15 @@
 import subprocess, serial, time
 ser = serial.Serial('/dev/ttyUSB0', 9600)
 #serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
+
+import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
+GPIO.setwarnings(False) # Ignore warning for now
+GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # Set pin 10 to be an input pin and set initial value to be pulled low (off)
     
 
 def main():
     #time.sleep(2)
-    subprocess.call(COMMAND_DICT["bottom-layer"], cwd='videos/')
-
     COMMAND_DICT = {"sun":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'], 
                      "rain":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
                      "snow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
@@ -36,8 +39,12 @@ def main():
                      "hurricane":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
                      "rainbow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '5', '&'],
                      "bottom-layer":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '--layer', '1', '--loop','&']}
-    while True:
-        if ser.in_waiting > 0 and BUTTON PRESSED:    ###FIX THIS
+    
+    # Call initialize background layer to hide screen
+    subprocess.call(COMMAND_DICT["bottom-layer"], cwd='videos/')
+    
+    while True:  # constantly check if button pressed and serial input waiting
+        if ser.in_waiting > 0 and GPIO.input(10) == GPIO.HIGH:    ###Check if button pushed and serial input in waiting
             line = ser.readline()
             #Arduinos constantly send data, captured all at once with big "submit" button from raspi
             if line == "Sun":
