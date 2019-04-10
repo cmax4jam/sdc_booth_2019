@@ -21,6 +21,9 @@
 
 
 import subprocess, serial, time
+serArd1 = serial.Serial('/dev/ttyUSB0', 9600)
+serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
+    
 
 def main():
     #time.sleep(2)
@@ -34,19 +37,21 @@ def main():
                      "rainbow":['omxplayer', '-o', 'local', '--no-keys', 'INSERTVIDEOFILE', '&'],
                      "bottom-layer"}
     while True:
-        #Arduinos constantly send data, captured all at once with big "submit" button from raspi
-        if SUN CONDITIONS:
-            subprocess.call(COMMAND_DICT["sun"], cwd='videos/')
-        elif RAIN CONDITIONS:
-            subprocess.call(COMMAND_DICT["rain"], cwd='videos/')
-        elif HURRICANE CONDITIONS:
-            subprocess.call(COMMAND_DICT["hurricane"], cwd='videos/')
-        elif TORNADO CONDITIONS:
-            subprocess.call(COMMAND_DICT["tornado"], cwd='videos/')
-        elif SNOW CONDITIONS:
-            subprocess.call(COMMAND_DICT["snow"], cwd='videos/')
-        elif RAINBOW CONDITIONS:
-            subprocess.call(COMMAND_DICT["rainbow"], cwd='videos/')
+        if ser.in_waiting > 0 and BUTTON PRESSED:
+            
+            #Arduinos constantly send data, captured all at once with big "submit" button from raspi
+            if SUN CONDITIONS:
+                subprocess.call(COMMAND_DICT["sun"], cwd='videos/')
+            elif RAIN CONDITIONS:
+                subprocess.call(COMMAND_DICT["rain"], cwd='videos/')
+            elif HURRICANE CONDITIONS:
+                subprocess.call(COMMAND_DICT["hurricane"], cwd='videos/')
+            elif TORNADO CONDITIONS:
+                subprocess.call(COMMAND_DICT["tornado"], cwd='videos/')
+            elif SNOW CONDITIONS:
+                subprocess.call(COMMAND_DICT["snow"], cwd='videos/')
+            elif RAINBOW CONDITIONS:
+                subprocess.call(COMMAND_DICT["rainbow"], cwd='videos/')
 
 
 

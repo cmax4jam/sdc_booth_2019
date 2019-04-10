@@ -26,13 +26,13 @@ bool outTemp;
 bool outWind;
 int potentiometer;
 
-Adafruit_7segment matrix = Adafruit_7segment();
+//Adafruit_7segment matrix = Adafruit_7segment();
 
 void setup() {
   Serial.begin(9600);
   pinMode(POTPINWIND, INPUT_PULLUP);
   pinMode(POTPINRAIN, INPUT_PULLUP);
-  matrix.begin(0x70);
+  //matrix.begin(0x70);
 
 }
 
@@ -40,7 +40,7 @@ void loop() {
   //potentiometer (wind)
   pWind = analogRead(POTPINWIND);
   wind = map(pWind, 0, 1023, -2, 200);
-  matrix.print(wind, DEC);
+  //matrix.print(wind, DEC);
   if (wind > 100) {
     outWind = HIGH;
 
@@ -48,13 +48,11 @@ void loop() {
   else {
     outWind = LOW;
   }
-  
- // matrix.writeDisplay();
 
    //potentiometer (rain)
   pRain = analogRead(POTPINRAIN);
   rain = map(pRain, 0, 1023, 0, 3);
-  matrix.print(rain, DEC);
+  //matrix.print(rain, DEC);
 
   
   // toggle pin (day and night)
@@ -71,23 +69,23 @@ void loop() {
   binTemp = map(temp, minTemp, maxTemp, 0 , 1);
   
   if (rain == 0 &&  timeOfDay == HIGH){
-    Serial.write("Sun");//sun 
+    Serial.println("Sun");//sun 
   }
   
   else if (rain == 0 && binTemp == 1 && outWind == HIGH){
-    Serial.write("Tornado");// tornado 
+    Serial.println("Tornado");// tornado 
   }
   else if (rain != 0 && binTemp == 0) { 
-    Serial.write("Snow");// snow 
+    Serial.println("Snow");// snow 
   }
   else if( outWind == HIGH && rain == 2 && binTemp == 1){
-    Serial.write("Hurricane"); // hurricane
+    Serial.println("Hurricane"); // hurricane
   }
   else if(outWind == LOW && rain != 0 &&  binTemp == 1){
-    Serial.write("Rain"); // rain 
+    Serial.println("Rain"); // rain 
   }
   else if( rain == 1 && timeOfDay == HIGH && binTemp == 1){
-    Serial.write("Rainbow");// rainbow
+    Serial.println("Rainbow");// rainbow
   }
 
   
