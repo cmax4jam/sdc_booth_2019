@@ -21,7 +21,8 @@
 
 
 import subprocess, serial, time
-ser = serial.Serial('/dev/ttyUSB0', 9600)
+serIn = serial.Serial('/dev/ttyUSB0', 9600)
+serOut = serial.Serial('/dev/ttyUSB1', 9600)
 #serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
 
 import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
@@ -44,8 +45,8 @@ def main():
     subprocess.call(COMMAND_DICT["bottom-layer"], cwd='videos/')
     
     while True:  # constantly check if button pressed and serial input waiting
-        if ser.in_waiting > 0 and GPIO.input(10) == GPIO.HIGH:    ###Check if button pushed and serial input in waiting
-            line = ser.readline()
+        if serIn.in_waiting > 0 and GPIO.input(10) == GPIO.HIGH:    ###Check if button pushed and serial input in waiting
+            line = serIn.readline()
             #Arduinos constantly send data, captured all at once with big "submit" button from raspi
             if line == "Sun":
                 subprocess.call(COMMAND_DICT["sun"], cwd='videos/')
