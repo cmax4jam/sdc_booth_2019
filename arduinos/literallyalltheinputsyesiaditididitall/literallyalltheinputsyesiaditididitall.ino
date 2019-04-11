@@ -5,8 +5,6 @@
 
 */
 #include <Wire.h>
-#include "Adafruit_LEDBackpack.h"
-#include "Adafruit_GFX.h"
 
 const int TOGGLEPIN = 1;
 const int SLIDEPIN = A0;
@@ -68,24 +66,26 @@ void loop() {
   temp = map(slidePot, 0, 1023, minTemp, maxTemp);
   binTemp = map(temp, minTemp, maxTemp, 0 , 1);
   
-  if (rain == 0 &&  timeOfDay == HIGH){
-    Serial.print("Sun\n");//sun 
+  if (binTemp == 1 && outWind == HIGH && rain == 0){
+    Serial.print("Tornado\n");//sun 
   }
-  
-  else if (rain == 0 && binTemp == 1 && outWind == HIGH){
-    Serial.print("Tornado\n");// tornado 
+  else if (binTemp == 1 && outWind == HIGH && rain == 2){
+    Serial.print("Hurricane\n");// tornado 
   }
-  else if (rain != 0 && binTemp == 0) { 
-    Serial.print("Snow\n");// snow 
+  else if (timeOfDay == LOW && rain == 0) { 
+    Serial.print("Night\n");// snow 
   }
-  else if( outWind == HIGH && rain == 2 && binTemp == 1){
-    Serial.print("Hurricane\n"); // hurricane
+  else if(timeOfDay == HIGH && rain == 0){
+    Serial.print("Sun\n"); // hurricane
   }
-  else if(outWind == LOW && rain != 0 &&  binTemp == 1){
-    Serial.print("Rain\n"); // rain 
+  else if(timeOfDay == HIGH && outWind == HIGH && rain == 1 && binTemp == 1){
+    Serial.print("Rainbow\n"); // rain 
   }
-  else if( rain == 1 && timeOfDay == HIGH && binTemp == 1){
-    Serial.print("Rainbow\n");// rainbow
+  else if( rain != 0 && binTemp == 0){
+    Serial.print("Snow\n");// rainbow
+  }
+  else{
+    Serial.println("Rain\n");
   }
 
   
