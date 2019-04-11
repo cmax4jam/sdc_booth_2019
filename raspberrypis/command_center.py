@@ -21,7 +21,7 @@
 
 
 import subprocess, serial, time, os
-serIn = serial.Serial('/dev/ttyACM0', 9600)
+serIn = serial.Serial('/dev/ttyACM2', 9600)
 serOut = serial.Serial('/dev/ttyAMA0', 9600)
 #serArd2 = serial.Serial('/dev/ttyUSB1', 9600)
 
@@ -39,6 +39,7 @@ def main():
                      "tornado":['omxplayer', '-o', 'local', '--no-keys', 'tornado.mp4', '--layer', '5', '&'],
                      "hurricane":['omxplayer', '-o', 'local', '--no-keys', 'hurricane.mp4', '--layer', '5', '&'],
                      "rainbow":['omxplayer', '-o', 'local', '--no-keys', 'rainbow.mp4', '--layer', '5', '&'],
+                    #  "night":['omxplayer', '-o', 'local', '--no-keys', 'night.mp4', '--layer', '5', '&'],
                      "bottom-layer":['omxplayer', '-o', 'local', '--no-keys', 'blackbackground.mp4', '--layer', '1', '--loop', '&']}
     
 
@@ -49,7 +50,6 @@ def main():
 
     
     while True:  # constantly check if button pressed and serial input waiting
-        fun = True
  
         if serIn.in_waiting > 0 and GPIO.input(23) == GPIO.HIGH:    ###Check if button pushed and serial input in waiting
             line = serIn.readline()
@@ -93,7 +93,12 @@ def main():
                 time.sleep(10)
                 omxplayer.terminate()
                 os.system('sudo killall omxplayer.bin')
-            fun = False
+            # elif "Night" in line
+            #     omxplayer = subprocess.Popen(COMMAND_DICT["night"], cwd='/home/pi/Desktop/booth2019_atmos/videos/')
+            #     serIn.write(b'6')
+            #     time.sleep(10)
+            #     omxplayer.terminate()
+            #     os.system('sudo killall omxplayer.bin')
         
             
 

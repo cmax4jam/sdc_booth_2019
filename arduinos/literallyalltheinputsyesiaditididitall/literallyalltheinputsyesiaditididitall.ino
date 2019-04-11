@@ -6,7 +6,7 @@
 */
 #include <Wire.h>
 
-const int TOGGLEPIN = 1;
+const int TOGGLEPIN = 2;
 const int SLIDEPIN = A0;
 const int POTPINWIND = A1;
 const int POTPINRAIN = A2;
@@ -18,11 +18,10 @@ int wind;
 int rain;
 int pWind;
 int pRain;
-int binTemp;
 bool timeOfDay;
-bool outTemp;
-bool outWind;
+int slidePot;
 int potentiometer;
+int counter = 0;
 
 //Adafruit_7segment matrix = Adafruit_7segment();
 
@@ -35,24 +34,22 @@ void setup() {
 }
 
 void loop() {
+  counter++;
   //potentiometer (wind)
-  pWind = analogRead(POTPINWIND);
-  wind = map(pWind, 0, 1023, -2, 200);
+  wind = analogRead(POTPINWIND);
   //matrix.print(wind, DEC);
-  if (wind > 100) {
-    outWind = HIGH;
-
-  }
-  else {
-    outWind = LOW;
-  }
+//  if (wind > 100) {
+//    outWind = HIGH;
+//
+//  }
+//  else {
+//    outWind = LOW;
+//  }
 
    //potentiometer (rain)
-  pRain = analogRead(POTPINRAIN);
-  rain = map(pRain, 0, 1023, 0, 2);
+  rain = analogRead(POTPINRAIN);
   //matrix.print(rain, DEC);
 
-  
   // toggle pin (day and night)
   if (digitalRead(TOGGLEPIN) == HIGH ) {
     timeOfDay = HIGH;
@@ -60,34 +57,40 @@ void loop() {
   else {
     timeOfDay = LOW;
   }
+  
+  temp = analogRead(SLIDEPIN);
+
 
   // slide potentiometer for temperature 
-  int slidePot = analogRead(SLIDEPIN);
-  temp = map(slidePot, 0, 1023, minTemp, maxTemp);
-  binTemp = map(temp, minTemp, maxTemp, 0 , 1);
-  
-  if (binTemp == 1 && outWind == HIGH && rain == 0){
-    Serial.print("Tornado\n");//sun 
+  if (counter % 2000 == 0) {
+    if (temp >= 512 && wind >= 512 && rain < 341){
+      Serial.print("Tornado\n");//sun 
+    }
+    else if (temp >= 512 && wind >= 512 && rain >= 682){
+      Serial.print("Hurricane\n");// tornado 
+    }
+    else if (timeOfDay == LOW && rain < 341) { 
+      Serial.print("Night\n");// snow 
+    }
+    else if(timeOfDay == HIGH && rain < 341){
+      Serial.print("Sun\n"); // hurricane
+    }
+    else if(timeOfDay == HIGH && wind < 512 && rain >= 341 && rain < 682 && temp >= 512){
+      Serial.print("Rainbow\n"); // rain 
+    }
+    else if( rain >= 341 && temp < 512){
+      Serial.print("Snow\n");// rainbow
+    }
+    else{
+      Serial.println("Rain\n");
+    }
+    Serial.println("------");
+    Serial.println(rain);
+    Serial.println(timeOfDay);
+    Serial.println(wind);
+    Serial.println(temp);
+    Serial.println("------");
+    counter = 0;
   }
-  else if (binTemp == 1 && outWind == HIGH && rain == 2){
-    Serial.print("Hurricane\n");// tornado 
-  }
-  else if (timeOfDay == LOW && rain == 0) { 
-    Serial.print("Night\n");// snow 
-  }
-  else if(timeOfDay == HIGH && rain == 0){
-    Serial.print("Sun\n"); // hurricane
-  }
-  else if(timeOfDay == HIGH && outWind == HIGH && rain == 1 && binTemp == 1){
-    Serial.print("Rainbow\n"); // rain 
-  }
-  else if( rain != 0 && binTemp == 0){
-    Serial.print("Snow\n");// rainbow
-  }
-  else{
-    Serial.println("Rain\n");
-  }
-
-  
 
 }
