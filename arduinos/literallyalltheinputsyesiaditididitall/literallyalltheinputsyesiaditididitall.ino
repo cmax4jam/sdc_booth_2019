@@ -51,7 +51,7 @@ void loop() {
 
    //potentiometer (rain)
   pRain = analogRead(POTPINRAIN);
-  rain = map(pRain, 0, 1023, 0, 3);
+  rain = map(pRain, 0, 1023, 0, 2);
   //matrix.print(rain, DEC);
 
   
@@ -69,23 +69,23 @@ void loop() {
   binTemp = map(temp, minTemp, maxTemp, 0 , 1);
   
   if (rain == 0 &&  timeOfDay == HIGH){
-    Serial.println("Sun");//sun 
+    Serial.print("Sun\n");//sun 
   }
   
   else if (rain == 0 && binTemp == 1 && outWind == HIGH){
-    Serial.println("Tornado");// tornado 
+    Serial.print("Tornado\n");// tornado 
   }
   else if (rain != 0 && binTemp == 0) { 
-    Serial.println("Snow");// snow 
+    Serial.print("Snow\n");// snow 
   }
   else if( outWind == HIGH && rain == 2 && binTemp == 1){
-    Serial.println("Hurricane"); // hurricane
+    Serial.print("Hurricane\n"); // hurricane
   }
   else if(outWind == LOW && rain != 0 &&  binTemp == 1){
-    Serial.println("Rain"); // rain 
+    Serial.print("Rain\n"); // rain 
   }
   else if( rain == 1 && timeOfDay == HIGH && binTemp == 1){
-    Serial.println("Rainbow");// rainbow
+    Serial.print("Rainbow\n");// rainbow
   }
 
   
