@@ -12,6 +12,9 @@ const int POTPINWIND = A1;
 const int POTPINRAIN = A2;
 const int maxTemp = 100;
 const int minTemp = 0;
+const int OUTPUTONE = 8;
+const int OUTPUTTWO = 9;
+const int OUTPUTTHREE = 10;
 
 int temp;
 int wind;
@@ -21,7 +24,9 @@ int pRain;
 bool timeOfDay;
 int slidePot;
 int potentiometer;
-int counter = 0;
+String weather;
+String readValue;
+
 
 //Adafruit_7segment matrix = Adafruit_7segment();
 
@@ -29,12 +34,14 @@ void setup() {
   Serial.begin(9600);
   pinMode(POTPINWIND, INPUT_PULLUP);
   pinMode(POTPINRAIN, INPUT_PULLUP);
+  pinMode(OUTPUTONE, OUTPUT);
+  pinMode(OUTPUTTWO, OUTPUT);
+  pinMode(OUTPUTTHREE, OUTPUT);
   //matrix.begin(0x70);
 
 }
 
 void loop() {
-  counter++;
   //potentiometer (wind)
   wind = analogRead(POTPINWIND);
   //matrix.print(wind, DEC);
@@ -62,35 +69,40 @@ void loop() {
 
 
   // slide potentiometer for temperature 
-  if (counter % 2000 == 0) {
-    if (temp >= 512 && wind >= 512 && rain < 341){
-      Serial.print("Tornado\n");//sun 
-    }
-    else if (temp >= 512 && wind >= 512 && rain >= 682){
-      Serial.print("Hurricane\n");// tornado 
-    }
-    else if (timeOfDay == LOW && rain < 341) { 
-      Serial.print("Night\n");// snow 
-    }
-    else if(timeOfDay == HIGH && rain < 341){
-      Serial.print("Sun\n"); // hurricane
-    }
-    else if(timeOfDay == HIGH && wind < 512 && rain >= 341 && rain < 682 && temp >= 512){
-      Serial.print("Rainbow\n"); // rain 
-    }
-    else if( rain >= 341 && temp < 512){
-      Serial.print("Snow\n");// rainbow
-    }
-    else{
-      Serial.println("Rain\n");
-    }
-    Serial.println("------");
-    Serial.println(rain);
-    Serial.println(timeOfDay);
-    Serial.println(wind);
-    Serial.println(temp);
-    Serial.println("------");
-    counter = 0;
+  if (temp >= 512 && wind >= 512 && rain < 341){ //tornado
+    digitalWrite(OUTPUTONE, HIGH);
+    digitalWrite(OUTPUTTWO, LOW);
+    digitalWrite(OUTPUTTHREE, LOW);  
   }
-
+  else if (temp >= 512 && wind >= 512 && rain >= 682){ //hurricane
+    digitalWrite(OUTPUTONE, LOW);
+    digitalWrite(OUTPUTTWO, HIGH);
+    digitalWrite(OUTPUTTHREE, LOW);  
+  }
+  else if (timeOfDay == LOW && rain < 341) { //night
+    digitalWrite(OUTPUTONE, LOW);
+    digitalWrite(OUTPUTTWO, LOW);
+    digitalWrite(OUTPUTTHREE, HIGH);  
+  }
+  else if(timeOfDay == HIGH && rain < 341){ //sun
+    digitalWrite(OUTPUTONE, HIGH);
+    digitalWrite(OUTPUTTWO, HIGH);
+    digitalWrite(OUTPUTTHREE, LOW);  
+  }
+  else if(timeOfDay == HIGH && wind < 512 && rain >= 341 && rain < 682 && temp >= 512){ //rainbow
+    digitalWrite(OUTPUTONE, HIGH);
+    digitalWrite(OUTPUTTWO, LOW);
+    digitalWrite(OUTPUTTHREE, HIGH);   
+  }
+  else if( rain >= 341 && temp < 512){ //snow
+    digitalWrite(OUTPUTONE, LOW);
+    digitalWrite(OUTPUTTWO, HIGH);
+    digitalWrite(OUTPUTTHREE, HIGH);  
+  }
+  else{ //rain
+    digitalWrite(OUTPUTONE, HIGH);
+    digitalWrite(OUTPUTTWO, HIGH);
+    digitalWrite(OUTPUTTHREE, HIGH);  
+  }
+ 
 }
